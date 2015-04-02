@@ -2,6 +2,7 @@
 # to ignore next files and folders:
 *.[oa]
 *~
+*.log
 log/
 tmp/
 pid/
