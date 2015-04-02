@@ -46,7 +46,7 @@ class Post extends CActiveRecord
 	{
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
-		return array(
+		/*return array(
 			array('title, content, status, author_id', 'required'),
 			array('status, create_time, update_time, author_id', 'numerical', 'integerOnly'=>true),
 			array('title', 'length', 'max'=>128),
@@ -54,7 +54,22 @@ class Post extends CActiveRecord
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
 			array('id, title, content, tags, status, create_time, update_time, author_id', 'safe', 'on'=>'search'),
+		);*/
+		return array(
+			array('title, content, status', 'required'),
+			array('title', 'length', 'max'=>128),
+			array('status', 'in', 'range'=>array(1,2,3)),
+			array('tags', 'match', 'pattern'=>'/^[\w\s,]+$/',
+				'message'=>'You can use also letters in the tags.'),
+			array('tags', 'normalizeTags'),
+ 
+			array('title, status', 'safe', 'on'=>'search'),
 		);
+	}
+	
+	public function normalizeTags($attribute,$params)
+	{
+		$this->tags=Tag::array2string(array_unique(Tag::string2array($this->tags)));
 	}
 
 	/**
@@ -64,9 +79,17 @@ class Post extends CActiveRecord
 	{
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
-		return array(
+		/*return array(
 			'comments' => array(self::HAS_MANY, 'Comment', 'post_id'),
 			'author' => array(self::BELONGS_TO, 'User', 'author_id'),
+		);*/
+		return array(
+			'author' => array(self::BELONGS_TO, 'User', 'author_id'),
+			'comments' => array(self::HAS_MANY, 'Comment', 'post_id',
+				'condition'=>'comments.status='.Comment::STATUS_APPROVED,
+				'order'=>'comments.create_time DESC'),
+			'commentCount' => array(self::STAT, 'Comment', 'post_id',
+				'condition'=>'status='.Comment::STATUS_APPROVED),
 		);
 	}
 
