@@ -19,6 +19,18 @@
  */
 class Post extends CActiveRecord
 {
+	
+	const STATUS_DRAFT=1;
+    const STATUS_PUBLISHED=2;
+    const STATUS_ARCHIVED=3;
+	
+	public function getUrl()
+    {
+        return Yii::app()->createUrl('post/view', array(
+            'id'=>$this->id,
+            'title'=>$this->title,
+        ));
+    }
 	/**
 	 * @return string the associated database table name
 	 */
